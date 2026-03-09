@@ -17,11 +17,7 @@
         -ms-overflow-style: none;  /* IE and Edge */
         scrollbar-width: none;  /* Firefox */
     }
-    /* Custom scroll snapping physics */
-    #botGrid {
-        scroll-snap-type: x mandatory;
-        scroll-padding: 0 4rem; /* Keeps cards aligned within the blur zone */
-    }
+    /* Note: Removed the hardcoded scroll-padding here, we will use Tailwind below! */
     .bot-card {
         scroll-snap-align: center;
     }
@@ -37,7 +33,7 @@
 <div class="text-center pt-20 pb-12 px-4 relative overflow-hidden animate-core-ui">
     <div class="absolute top-0 left-1/2 transform -translate-x-1/2 w-full max-w-5xl h-80 bg-gradient-to-r from-blue-700 via-purple-700 to-blue-700 rounded-full blur-[150px] opacity-25 pointer-events-none"></div>
     
-    <h1 class="text-5xl tracking-tighter font-extrabold text-white sm:text-6xl md:text-7xl mb-6 relative z-10">
+    <h1 class="text-4xl tracking-tighter font-extrabold text-white sm:text-6xl md:text-7xl mb-6 relative z-10">
         <span class="block">The Future of Deployment:</span>
         <span class="block text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-blue-400">Autonomous Agents</span>
     </h1>
@@ -53,7 +49,7 @@
                 </svg>
             </div>
             <input type="text" id="searchInput" onkeyup="filterBotsSmoothly()" placeholder="Search agents (e.g., 'README', 'Python wizard')..." 
-                class="w-full bg-gray-950 border border-gray-700 rounded-full py-5 pl-14 pr-6 text-white text-lg placeholder-gray-500 
+                class="w-full bg-gray-950 border border-gray-700 rounded-full py-4 md:py-5 pl-14 pr-6 text-white text-base md:text-lg placeholder-gray-500 
                 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent 
                 shadow-[0_0_20px_rgba(37,99,235,0.2)] hover:shadow-[0_0_30px_rgba(37,99,235,0.4)] focus:shadow-[0_0_40px_rgba(37,99,235,0.6)]
                 transition-all duration-500 ease-in-out">
@@ -63,8 +59,8 @@
 
 <div class="max-w-7xl mx-auto py-8 animate-core-ui relative" style="animation-delay: 0.3s; opacity: 0;">
     
-    <div class="flex items-center justify-between mb-8 px-4 border-b border-gray-800 pb-5">
-        <h2 class="text-2xl font-bold text-white tracking-wide flex items-center">
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 px-4 border-b border-gray-800 pb-5 gap-3">
+        <h2 class="text-xl md:text-2xl font-bold text-white tracking-wide flex items-center">
             <span class="relative flex h-3 w-3 mr-3">
                 <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
                 <span class="relative inline-flex rounded-full h-3 w-3 bg-blue-500"></span>
@@ -87,12 +83,12 @@
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
         </button>
 
-        <div class="absolute left-0 top-0 bottom-0 w-24 z-20 pointer-events-none rounded-l-2xl bg-gradient-to-r from-gray-900 via-gray-900/80 to-transparent"></div>
-        <div class="absolute right-0 top-0 bottom-0 w-32 z-20 pointer-events-none rounded-r-2xl bg-gradient-to-l from-gray-900 via-gray-900/90 to-transparent"></div>
+        <div class="absolute left-0 top-0 bottom-0 w-8 md:w-24 z-20 pointer-events-none rounded-l-2xl bg-gradient-to-r from-gray-900 via-gray-900/80 to-transparent"></div>
+        <div class="absolute right-0 top-0 bottom-0 w-8 md:w-32 z-20 pointer-events-none rounded-r-2xl bg-gradient-to-l from-gray-900 via-gray-900/90 to-transparent"></div>
 
-        <div id="botGrid" class="flex flex-row flex-nowrap overflow-x-scroll gap-6 px-16 py-10 scrollbar-hide snap-x snap-mandatory relative z-10 transition-all duration-500 scroll-smooth">
+        <div id="botGrid" class="flex flex-row flex-nowrap overflow-x-scroll gap-4 md:gap-6 px-4 md:px-16 py-10 scrollbar-hide snap-x snap-mandatory relative z-10 transition-all duration-500 scroll-smooth scroll-pl-4 md:scroll-pl-16">
             {% for bot in bots %}
-            <div class="bot-card flex-none w-[22rem] bg-gray-800 rounded-2xl border border-gray-700 
+            <div class="bot-card flex-none w-[85vw] sm:w-[20rem] md:w-[22rem] bg-gray-800 rounded-2xl border border-gray-700 
                 hover:-translate-y-4 hover:border-blue-500 hover:shadow-[0_0_40px_rgba(59,130,246,0.5)] 
                 transition-all duration-500 ease-in-out snap-center flex flex-col relative group overflow-hidden"
                 data-name="{{ bot.name|lower }}" data-desc="{{ bot.desc|lower }}">
@@ -106,12 +102,12 @@
                 </div>
                 {% endif %}
 
-                <div class="p-8 flex-grow">
+                <div class="p-6 md:p-8 flex-grow">
                     <div class="flex items-center space-x-3 mb-3">
                         <div class="h-10 w-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center text-white text-xl font-bold shadow-md">
                             {{ bot.name[0] }}
                         </div>
-                        <h3 class="text-xl font-bold text-white transition-colors group-hover:text-blue-300">{{ bot.name }}</h3>
+                        <h3 class="text-lg md:text-xl font-bold text-white transition-colors group-hover:text-blue-300">{{ bot.name }}</h3>
                     </div>
 
                     <div class="flex items-center mb-5 text-xs bg-gray-900/50 inline-flex px-3 py-1 rounded-full border border-gray-700">
@@ -124,34 +120,34 @@
                         {{ bot.desc }}
                     </p>
                     
-                    <div class="flex items-center justify-between mt-auto pt-4 border-t border-gray-700/50">
+                    <div class="flex flex-wrap items-center justify-between mt-auto pt-4 border-t border-gray-700/50 gap-2">
                         <div class="flex items-center text-xs text-gray-400 font-medium">
                             <svg class="h-4 w-4 mr-1.5 text-gray-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path></svg>
                             {{ bot.dev }}
                         </div>
-                        <span class="inline-flex items-center px-4 py-1.5 rounded-full text-sm font-bold bg-blue-950 text-blue-200 border border-blue-800 shadow-inner">
+                        <span class="inline-flex items-center px-3 py-1.5 md:px-4 rounded-full text-xs md:text-sm font-bold bg-blue-950 text-blue-200 border border-blue-800 shadow-inner">
                             {{ bot.price }}
                         </span>
                     </div>
                 </div>
                 
-                <div class="bg-gray-900 px-8 py-5 border-t border-gray-700 mt-auto">
-                    <a href="{{ url_for('bot_details', bot_id=bot.id) }}" class="w-full flex justify-center items-center bg-blue-700 border border-transparent text-white hover:bg-blue-600 hover:shadow-[0_0_25px_rgba(37,99,235,0.7)] font-bold py-3 px-6 rounded-lg transition-all duration-300 text-lg">
+                <div class="bg-gray-900 px-6 py-4 md:px-8 md:py-5 border-t border-gray-700 mt-auto">
+                    <a href="{{ url_for('bot_details', bot_id=bot.id) }}" class="w-full flex justify-center items-center bg-blue-700 border border-transparent text-white hover:bg-blue-600 hover:shadow-[0_0_25px_rgba(37,99,235,0.7)] font-bold py-2.5 md:py-3 px-6 rounded-lg transition-all duration-300 text-base md:text-lg">
                         Analyze Specifications
                     </a>
                 </div>
             </div>
             {% endfor %}
-            <div class="flex-none w-16 pointer-events-none"></div>
+            <div class="flex-none w-4 md:w-16 pointer-events-none"></div>
         </div>
     </div>
 </div>
 
 <script>
-    // Handles the left/right arrow clicks
     function scrollGrid(direction) {
         const grid = document.getElementById('botGrid');
-        const scrollAmount = 400; 
+        // Let the scroll amount adapt slightly based on screen size
+        const scrollAmount = window.innerWidth < 768 ? window.innerWidth * 0.85 : 400; 
         
         if (direction === 'left') {
             grid.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
@@ -160,7 +156,6 @@
         }
     }
 
-    // Handles the search bar filtering
     function filterBotsSmoothly() {
         let input = document.getElementById('searchInput').value.toLowerCase();
         let cards = document.getElementsByClassName('bot-card');
