@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8 animate-fade-in">
+    
+    <div class="mb-8">
+        <h1 class="text-4xl font-extrabold text-white">Deploy Autonomous Agent</h1>
+        <p class="text-gray-400 mt-2">Publish your microservice to the global grid. Ensure your endpoint complies with our API protocol.</p>
+    </div>
+
+    <div class="flex flex-col lg:flex-row gap-8">
+        
+        <div class="lg:w-1/2 space-y-6">
+            <div class="bg-gray-900 border border-gray-700 rounded-2xl p-8 shadow-lg">
+                <h3 class="text-xl font-bold text-blue-400 mb-4 flex items-center">
+                    <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                    Strict API Protocol
+                </h3>
+                <p class="text-gray-400 text-sm mb-6 leading-relaxed">
+                    Our decentralized marketplace is language-agnostic. Your agent can be built in Python, Node, or Go. However, it <strong>must</strong> adhere to the following strict JSON schema to successfully communicate with our workspace terminals.
+                </p>
+
+                <div class="mb-6">
+                    <h4 class="text-white font-semibold text-sm mb-2 uppercase tracking-wide">1. Expected Incoming POST Request</h4>
+                    <div class="bg-gray-950 rounded-lg p-4 border border-gray-800 font-mono text-xs text-green-400 overflow-x-auto">
+<pre><code>{
+  "message": "User's task description string",
+  "agent_id": "Your unique agent ID"
+}</code></pre>
+                    </div>
+                </div>
+
+                <div>
+                    <h4 class="text-white font-semibold text-sm mb-2 uppercase tracking-wide">2. Required JSON Response</h4>
+                    <div class="bg-gray-950 rounded-lg p-4 border border-gray-800 font-mono text-xs text-blue-400 overflow-x-auto">
+<pre><code>{
+  "reply": "Your markdown-formatted response",
+  "status": "success"
+}</code></pre>
+                    </div>
+                </div>
+                
+                <div class="mt-6 p-4 bg-yellow-900/30 border border-yellow-700 rounded-lg">
+                    <p class="text-yellow-500 text-xs font-semibold">⚠️ Note: Endpoints failing to return the exact "reply" key will result in a Terminal Crash in the employer's workspace.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="lg:w-1/2">
+            <div class="bg-gray-800 border border-gray-700 rounded-2xl p-8 shadow-[0_0_30px_rgba(0,0,0,0.5)] relative overflow-hidden">
+                <div class="absolute -top-10 -right-10 w-32 h-32 bg-blue-500 rounded-full blur-[80px] opacity-20 pointer-events-none"></div>
+
+                <form action="{{ url_for('deploy') }}" method="POST" class="space-y-5 relative z-10">
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-1">Agent Name</label>
+                        <input type="text" name="name" required placeholder="e.g., CodeReview Pro" class="w-full bg-gray-900 border border-gray-600 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-5">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-1">Developer Handle</label>
+                            <input type="text" name="dev" required placeholder="e.g., @TechNinja" class="w-full bg-gray-900 border border-gray-600 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-1">Monthly Salary (₦)</label>
+                            <input type="text" name="price" required placeholder="e.g., 50,000" class="w-full bg-gray-900 border border-gray-600 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-1">Live Endpoint URL</label>
+                        <input type="url" name="endpoint" required placeholder="http://your-server-ip:port/generate" class="w-full bg-gray-900 border border-gray-600 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition font-mono text-sm">
+                        <p class="text-xs text-gray-500 mt-1">Must accept POST requests and handle CORS.</p>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-1">Agent Description & Capabilities</label>
+                        <textarea name="desc" required rows="3" placeholder="Describe what tasks this agent autonomously handles..." class="w-full bg-gray-900 border border-gray-600 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"></textarea>
+                    </div>
+
+                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 px-6 rounded-lg shadow-[0_0_15px_rgba(37,99,235,0.4)] transition-all flex justify-center items-center mt-4">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                        Deploy to Marketplace
+                    </button>
+                </form>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

@@ -1,26 +1,32 @@
 import os
 import requests
-from flask import Flask, render_template, request, redirect, url_for, session, jsonify
+from flask import Flask, render_template, request, redirect, url_for, session, jsonify, flash
 import pyrebase
 from dotenv import load_dotenv
+import uuid
+
 
 load_dotenv()
 
 app = Flask(__name__)
 app.secret_key = 'super_secret_hackathon_key'
 
+firebaseApi = os.getenv('FIREBASE_API_KEY')
+
 # -------------------------------------------------------------
 # FIREBASE CONFIGURATION (Add real keys in .env later)
 # -------------------------------------------------------------
 firebaseConfig = {
-    "apiKey": os.getenv("FIREBASE_API_KEY", "mock_key"),
-    "authDomain": "your-project.firebaseapp.com",
-    "databaseURL": "https://your-project-default-rtdb.firebaseio.com",
-    "projectId": "your-project",
-    "storageBucket": "your-project.appspot.com",
-    "messagingSenderId": "123456789",
-    "appId": "1:123:web:456"
+  'apiKey': firebaseApi,
+  'authDomain': "agentwork-286b1.firebaseapp.com",
+  'databaseURL': "https://agentwork-286b1-default-rtdb.europe-west1.firebasedatabase.app",
+  'projectId': "agentwork-286b1",
+  'storageBucket': "agentwork-286b1.firebasestorage.app",
+  'messagingSenderId': "853364448721",
+  'appId': "1:853364448721:web:bad7cda4a5cb002849d4f0"
 }
+
+
 
 try:
     firebase = pyrebase.initialize_app(firebaseConfig)
@@ -95,8 +101,21 @@ mock_bots = [
 # -------------------------------------------------------------
 @app.route('/')
 def index():
-    return render_template('index.html', bots=mock_bots)
-
+    live_bots = []
+    if db:
+        try:
+            bots_query = db.child("bots").get()
+            if bots_query.each():
+                for bot in bots_query.each():
+                    if bot.val():
+                        live_bots.append(bot.val())
+        except Exception as e:
+            print(f"Error fetching from Firebase: {e}")
+            live_bots = mock_bots 
+    else:
+        live_bots = mock_bots
+        
+    return render_template('index.html', bots=live_bots)
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -146,9 +165,24 @@ def employer_dashboard():
     if session.get('role') != 'employer':
         return redirect(url_for('login'))
         
-    purchased_ids = session.get('purchased_bots', [])
-    my_bots = [b for b in mock_bots if b['id'] in purchased_ids]
+    # Force all purchased IDs to be strings so they perfectly match Firebase!
+    purchased_ids = [str(pid) for pid in session.get('purchased_bots', [])]
+    my_bots = []
     
+    if db:
+        try:
+            bots_query = db.child("bots").get()
+            
+            # .each() is the bulletproof way to read Pyrebase data
+            if bots_query.each():
+                for bot in bots_query.each():
+                    bot_data = bot.val()
+                    # Check if bot exists AND its ID string is in our purchased list
+                    if bot_data and str(bot_data.get('id')) in purchased_ids:
+                        my_bots.append(bot_data)
+        except Exception as e:
+            print(f"Dashboard Firebase Error: {e}")
+            
     return render_template('dashboard.html', bots=my_bots, role='employer')
 
 @app.route('/dashboard/developer')
@@ -166,7 +200,13 @@ def chat_ui(bot_id):
     if bot_id not in purchased:
         return redirect(url_for('bot_details', bot_id=bot_id))
         
-    bot = next((b for b in mock_bots if b['id'] == bot_id), None)
+    bot = None
+    if db:
+        bot = db.child("bots").child(bot_id).get().val()
+        
+    if not bot:
+        return "Agent data corrupted or missing.", 404
+        
     return render_template('chat.html', bot=bot)
 
 @app.route('/api/chat', methods=['POST'])
@@ -175,11 +215,14 @@ def api_chat():
     bot_id = str(data.get('agent_id'))
     user_message = data.get('message')
     
-    bot = next((b for b in mock_bots if b['id'] == bot_id), None)
+    # Fetch the live endpoint from Firebase
+    bot = None
+    if db:
+        bot = db.child("bots").child(bot_id).get().val()
     
-    if bot and bot['endpoint'] != 'mock':
+    if bot and bot.get('endpoint') and bot['endpoint'] != 'mock':
         try:
-            # This request reaches across from Windows into WSL!
+            # Reaching across into WSL!
             response = requests.post(
                 bot['endpoint'], 
                 json={"message": user_message},
@@ -187,10 +230,55 @@ def api_chat():
             )
             return jsonify(response.json())
         except requests.exceptions.RequestException as e:
-            return jsonify({"reply": f"**Connection Error:** Make sure the WSL bot is running on port 5001. Details: {str(e)}"})
+            return jsonify({"reply": f"**Connection Error:** Agent offline or endpoint unreachable. Details: {str(e)}"})
             
     return jsonify({"reply": "🔒 *Premium Agent Locked.* This is a mocked bot simulation."})
 
+
+
+@app.route('/deploy', methods=['GET', 'POST'])
+def deploy():
+    if request.method == 'POST':
+        bot_id = str(uuid.uuid4())[:8]
+        new_bot = {
+            "id": bot_id, 
+            "name": request.form.get('name'),
+            "dev": request.form.get('dev'),
+            "price": request.form.get('price') + " / mo",
+            "desc": request.form.get('desc'),
+            "endpoint": request.form.get('endpoint'),
+            "rating": "New", 
+            "reviews": "0"
+        }
+        
+        # PUSH TO FIREBASE!
+        if db:
+            db.child("bots").child(bot_id).set(new_bot)
+        else:
+            mock_bots.append(new_bot) # Fallback just in case
+        
+        flash(f"Agent '{new_bot['name']}' successfully deployed to the grid!", "success")
+        return redirect(url_for('developer_dashboard'))
+        
+    return render_template('deploy.html')
+
+# -------------------------------------------------------------
+# TEMPORARY ROUTE TO SEED FIREBASE WITH MOCK BOTS
+# -------------------------------------------------------------
+@app.route('/seed')
+def seed_db():
+    if not db:
+        return "❌ Firebase is not connected. Check your .env and config."
+        
+    try:
+        # Loop through your 10 mock bots and push them to Firebase
+        for bot in mock_bots:
+            # We use the bot['id'] as the specific key in the database
+            db.child("bots").child(bot['id']).set(bot)
+            
+        return "✅ BOOM! Database successfully populated with 10 premium agents! Go check your Firebase console, then visit the homepage."
+    except Exception as e:
+        return f"❌ Error populating database: {e}"
 if __name__ == '__main__':
     # Runs on Windows on port 5000
     app.run(debug=True, port=5000)
