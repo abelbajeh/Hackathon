@@ -11,11 +11,10 @@ load_dotenv()
 app = Flask(__name__)
 app.secret_key = 'super_secret_hackathon_key'
 
-# -------------------------------------------------------------
+
 # FIREBASE CONFIGURATION
-# -------------------------------------------------------------
 firebaseConfig = {
-  'apiKey': os.getenv('FIREBASE_API'), # Or hardcode your AIzaSy... key here if .env is failing
+  'apiKey': os.getenv('FIREBASE_API'),
   'authDomain': "agentwork-286b1.firebaseapp.com",
   'databaseURL': "https://agentwork-286b1-default-rtdb.europe-west1.firebasedatabase.app",
   'projectId': "agentwork-286b1",
@@ -28,11 +27,11 @@ try:
     firebase = pyrebase.initialize_app(firebaseConfig)
     db = firebase.database()
     auth = firebase.auth() 
-    print("🔥 Firebase DB and Auth connected successfully!")
+
 except Exception as e:
     db = None
     auth = None
-    print(f"❌ Firebase error: {e}")
+    
 
 # -------------------------------------------------------------
 # SECURITY DECORATOR
