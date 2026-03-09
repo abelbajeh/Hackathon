@@ -1,0 +1,186 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    @keyframes smoothFadeInUp {
+        from { opacity: 0; transform: translateY(30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-core-ui {
+        animation: smoothFadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    /* Hides default scrollbar for the pure showcase look */
+    .scrollbar-hide::-webkit-scrollbar {
+        display: none;
+    }
+    .scrollbar-hide {
+        -ms-overflow-style: none;  /* IE and Edge */
+        scrollbar-width: none;  /* Firefox */
+    }
+    /* Custom scroll snapping physics */
+    #botGrid {
+        scroll-snap-type: x mandatory;
+        scroll-padding: 0 4rem; /* Keeps cards aligned within the blur zone */
+    }
+    .bot-card {
+        scroll-snap-align: center;
+    }
+    @keyframes bounceHorizontal {
+        0%, 100% { transform: translateX(0) translateY(-50%); }
+        50% { transform: translateX(5px) translateY(-50%); }
+    }
+    .animate-bounce-horizontal {
+        animation: bounceHorizontal 2s infinite;
+    }
+</style>
+
+<div class="text-center pt-20 pb-12 px-4 relative overflow-hidden animate-core-ui">
+    <div class="absolute top-0 left-1/2 transform -translate-x-1/2 w-full max-w-5xl h-80 bg-gradient-to-r from-blue-700 via-purple-700 to-blue-700 rounded-full blur-[150px] opacity-25 pointer-events-none"></div>
+    
+    <h1 class="text-5xl tracking-tighter font-extrabold text-white sm:text-6xl md:text-7xl mb-6 relative z-10">
+        <span class="block">The Future of Deployment:</span>
+        <span class="block text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-blue-400">Autonomous Agents</span>
+    </h1>
+    <p class="mt-3 max-w-md mx-auto text-base text-gray-400 sm:text-lg md:mt-5 md:text-xl md:max-w-3xl relative z-10 leading-relaxed">
+        Discover, integrate, and deploy elite AI microservices. Your immediate, specialized workforce is ready.
+    </p>
+
+    <div class="mt-12 max-w-2xl mx-auto relative z-10 group">
+        <div class="relative flex items-center">
+            <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
+                <svg class="h-5 w-5 text-gray-500 group-hover:text-blue-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+            </div>
+            <input type="text" id="searchInput" onkeyup="filterBotsSmoothly()" placeholder="Search agents (e.g., 'README', 'Python wizard')..." 
+                class="w-full bg-gray-950 border border-gray-700 rounded-full py-5 pl-14 pr-6 text-white text-lg placeholder-gray-500 
+                focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent 
+                shadow-[0_0_20px_rgba(37,99,235,0.2)] hover:shadow-[0_0_30px_rgba(37,99,235,0.4)] focus:shadow-[0_0_40px_rgba(37,99,235,0.6)]
+                transition-all duration-500 ease-in-out">
+        </div>
+    </div>
+</div>
+
+<div class="max-w-7xl mx-auto py-8 animate-core-ui relative" style="animation-delay: 0.3s; opacity: 0;">
+    
+    <div class="flex items-center justify-between mb-8 px-4 border-b border-gray-800 pb-5">
+        <h2 class="text-2xl font-bold text-white tracking-wide flex items-center">
+            <span class="relative flex h-3 w-3 mr-3">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-3 w-3 bg-blue-500"></span>
+            </span>
+            Active Agent Roster
+        </h2>
+        
+        <div class="text-sm text-gray-400 flex items-center animate-pulse">
+            Swipe or use arrows to explore <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+        </div>
+    </div>
+
+    <div class="relative group">
+        
+        <button onclick="scrollGrid('left')" class="absolute left-4 top-1/2 transform -translate-y-1/2 z-30 bg-gray-900/80 hover:bg-blue-600 text-white p-3 rounded-full border border-gray-600 shadow-[0_0_15px_rgba(0,0,0,0.5)] hover:shadow-[0_0_20px_rgba(37,99,235,0.6)] backdrop-blur-md transition-all opacity-0 group-hover:opacity-100 hidden md:block">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+        </button>
+
+        <button onclick="scrollGrid('right')" class="absolute right-4 top-1/2 transform -translate-y-1/2 z-30 bg-gray-900/80 hover:bg-blue-600 text-white p-3 rounded-full border border-gray-600 shadow-[0_0_15px_rgba(0,0,0,0.5)] hover:shadow-[0_0_20px_rgba(37,99,235,0.6)] backdrop-blur-md transition-all opacity-100 group-hover:scale-110 hidden md:block animate-bounce-horizontal">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+        </button>
+
+        <div class="absolute left-0 top-0 bottom-0 w-24 z-20 pointer-events-none rounded-l-2xl bg-gradient-to-r from-gray-900 via-gray-900/80 to-transparent"></div>
+        <div class="absolute right-0 top-0 bottom-0 w-32 z-20 pointer-events-none rounded-r-2xl bg-gradient-to-l from-gray-900 via-gray-900/90 to-transparent"></div>
+
+        <div id="botGrid" class="flex flex-row flex-nowrap overflow-x-scroll gap-6 px-16 py-10 scrollbar-hide snap-x snap-mandatory relative z-10 transition-all duration-500 scroll-smooth">
+            {% for bot in bots %}
+            <div class="bot-card flex-none w-[22rem] bg-gray-800 rounded-2xl border border-gray-700 
+                hover:-translate-y-4 hover:border-blue-500 hover:shadow-[0_0_40px_rgba(59,130,246,0.5)] 
+                transition-all duration-500 ease-in-out snap-center flex flex-col relative group overflow-hidden"
+                data-name="{{ bot.name|lower }}" data-desc="{{ bot.desc|lower }}">
+                
+                <div class="absolute inset-0 bg-gradient-to-br from-gray-800/50 to-gray-950 opacity-100 -z-10 transition-opacity duration-500 group-hover:opacity-0"></div>
+                <div class="absolute inset-0 bg-gradient-to-br from-gray-800 to-purple-950 opacity-0 group-hover:opacity-100 -z-10 transition-opacity duration-500"></div>
+
+                {% if bot.id == "1" %}
+                <div class="absolute top-0 right-0 mt-4 mr-4 px-3 py-1 bg-green-950/70 text-green-400 text-xs font-bold rounded-full shadow-[0_0_15px_rgba(34,197,94,0.6)] border border-green-600 animate-pulse z-20">
+                    LIVE DEMO
+                </div>
+                {% endif %}
+
+                <div class="p-8 flex-grow">
+                    <div class="flex items-center space-x-3 mb-3">
+                        <div class="h-10 w-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center text-white text-xl font-bold shadow-md">
+                            {{ bot.name[0] }}
+                        </div>
+                        <h3 class="text-xl font-bold text-white transition-colors group-hover:text-blue-300">{{ bot.name }}</h3>
+                    </div>
+
+                    <div class="flex items-center mb-5 text-xs bg-gray-900/50 inline-flex px-3 py-1 rounded-full border border-gray-700">
+                        <svg class="w-4 h-4 text-yellow-400 mr-1" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+                        <span class="text-gray-200 font-bold mr-1">{{ bot.rating }}</span>
+                        <span class="text-gray-500">({{ bot.reviews }} Ratings)</span>
+                    </div>
+                    
+                    <p class="text-gray-400 text-sm mb-6 leading-relaxed line-clamp-3">
+                        {{ bot.desc }}
+                    </p>
+                    
+                    <div class="flex items-center justify-between mt-auto pt-4 border-t border-gray-700/50">
+                        <div class="flex items-center text-xs text-gray-400 font-medium">
+                            <svg class="h-4 w-4 mr-1.5 text-gray-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path></svg>
+                            {{ bot.dev }}
+                        </div>
+                        <span class="inline-flex items-center px-4 py-1.5 rounded-full text-sm font-bold bg-blue-950 text-blue-200 border border-blue-800 shadow-inner">
+                            {{ bot.price }}
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="bg-gray-900 px-8 py-5 border-t border-gray-700 mt-auto">
+                    <a href="{{ url_for('bot_details', bot_id=bot.id) }}" class="w-full flex justify-center items-center bg-blue-700 border border-transparent text-white hover:bg-blue-600 hover:shadow-[0_0_25px_rgba(37,99,235,0.7)] font-bold py-3 px-6 rounded-lg transition-all duration-300 text-lg">
+                        Analyze Specifications
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+            <div class="flex-none w-16 pointer-events-none"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Handles the left/right arrow clicks
+    function scrollGrid(direction) {
+        const grid = document.getElementById('botGrid');
+        const scrollAmount = 400; 
+        
+        if (direction === 'left') {
+            grid.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+        } else {
+            grid.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+        }
+    }
+
+    // Handles the search bar filtering
+    function filterBotsSmoothly() {
+        let input = document.getElementById('searchInput').value.toLowerCase();
+        let cards = document.getElementsByClassName('bot-card');
+        let gridContainer = document.getElementById('botGrid');
+
+        gridContainer.style.opacity = '0.5';
+
+        setTimeout(() => {
+            for (let i = 0; i < cards.length; i++) {
+                let botName = cards[i].getAttribute('data-name');
+                let botDesc = cards[i].getAttribute('data-desc');
+                
+                if (botName.includes(input) || botDesc.includes(input)) {
+                    cards[i].style.display = "flex";
+                } else {
+                    cards[i].style.display = "none";
+                }
+            }
+            gridContainer.style.opacity = '1';
+        }, 150); 
+    }
+</script>
+{% endblock %}

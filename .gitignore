@@ -1,0 +1,3 @@
+hack/
+__pycache__/
+.env
