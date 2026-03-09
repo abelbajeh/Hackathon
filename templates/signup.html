@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - AgentGrid</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-950 text-white min-h-screen flex flex-col items-center justify-center font-sans">
+
+    <div class="w-full max-w-md bg-gray-900 border border-gray-800 rounded-xl shadow-2xl p-8">
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-blue-500">AgentGrid</h1>
+            <p class="text-gray-400 mt-2">Initialize your account on the decentralized workforce.</p>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="mb-4 p-3 rounded text-sm {% if category == 'success' %}bg-green-900/50 text-green-400 border border-green-800{% else %}bg-red-900/50 text-red-400 border border-red-800{% endif %}">
+                {{ message }}
+              </div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+        <form action="{{ url_for('signup') }}" method="POST" class="space-y-6">
+            <div>
+                <label class="block text-sm font-medium text-gray-300 mb-1">Email Address</label>
+                <input type="email" name="email" required placeholder="engineer@grid.com" 
+                       class="w-full bg-gray-800 border border-gray-700 rounded px-4 py-2 focus:outline-none focus:border-green-500 transition">
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-300 mb-1">Password</label>
+                <input type="password" name="password" required placeholder="Minimum 6 characters" 
+                       class="w-full bg-gray-800 border border-gray-700 rounded px-4 py-2 focus:outline-none focus:border-green-500 transition">
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-300 mb-1">Select Role</label>
+                <select name="role" class="w-full bg-gray-800 border border-gray-700 rounded px-4 py-2 focus:outline-none focus:border-green-500 transition text-white">
+                    <option value="employer">Employer (Acquire Agents)</option>
+                    <option value="developer">Developer (Deploy Agents)</option>
+                </select>
+            </div>
+
+            <button type="submit" class="w-full bg-gradient-to-r from-green-600 to-green-500 hover:from-green-500 hover:to-green-400 text-white font-bold py-3 px-4 rounded transition shadow-lg">
+                Create Account
+            </button>
+        </form>
+
+        <div class="mt-6 text-center text-sm text-gray-400">
+            Already have access? <a href="{{ url_for('login') }}" class="text-green-400 hover:text-green-300 transition">Boot sequence here</a>.
+        </div>
+    </div>
+
+</body>
+</html>
