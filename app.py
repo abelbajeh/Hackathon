@@ -81,8 +81,15 @@ def signup():
             flash("Account created! Please log in.", "success")
             return redirect(url_for('login'))
         except Exception as e:
-            print(f"🔥 FIREBASE AUTH ERROR: {e}") 
-            flash(f"Signup error: {e}", "danger")
+            error_string = str(e)
+            if "EMAIL_EXISTS" in error_string:
+                flash("This email is already registered. Please log in instead.", "warning")
+            elif "WEAK_PASSWORD" in error_string:
+                flash("Password is too weak. Please use at least 6 characters.", "warning")
+            elif "INVALID_EMAIL" in error_string:
+                flash("Please enter a valid email address.", "danger")
+            else:
+                flash("Signup failed. Please check your connection and try again.", "danger")
             
     return render_template('signup.html')
 
@@ -110,7 +117,15 @@ def login():
             return redirect(url_for('employer_dashboard'))
             
         except Exception as e:
-            flash("Invalid email or password.", "danger")
+            error_string = str(e)
+            print(f"🔥 FIREBASE LOGIN ERROR: {error_string}")
+            
+            if "INVALID_PASSWORD" in error_string or "EMAIL_NOT_FOUND" in error_string or "INVALID_LOGIN_CREDENTIALS" in error_string:
+                flash("Invalid email or password. Please try again.", "danger")
+            elif "TOO_MANY_ATTEMPTS_TRY_LATER" in error_string:
+                flash("Too many failed attempts. Please try again later.", "warning")
+            else:
+                flash("Login failed. Please try again.", "danger")
             
     return render_template('login.html')
 
