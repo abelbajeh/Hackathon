@@ -36,7 +36,18 @@ except Exception as e:
 # -------------------------------------------------------------
 # SECURITY DECORATOR
 # -------------------------------------------------------------
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'user_id' not in session:
+            flash("🔒 Please login to access this secure area.", "warning")
+            return redirect(url_for('login'))
+        return f(*args, **kwargs)
+    return decorated_function
 
+# -------------------------------------------------------------
+# PUBLIC ROUTES
+# -------------------------------------------------------------
 @app.route('/switch_role')
 @login_required
 def switch_role():
@@ -60,18 +71,8 @@ def switch_role():
     if new_role == 'developer':
         return redirect(url_for('developer_dashboard'))
     return redirect(url_for('employer_dashboard'))
-def login_required(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if 'user_id' not in session:
-            flash("🔒 Please login to access this secure area.", "warning")
-            return redirect(url_for('login'))
-        return f(*args, **kwargs)
-    return decorated_function
 
-# -------------------------------------------------------------
-# PUBLIC ROUTES
-# -------------------------------------------------------------
+
 @app.route('/')
 def index():
     live_bots = []
@@ -105,15 +106,8 @@ def signup():
             flash("Account created! Please log in.", "success")
             return redirect(url_for('login'))
         except Exception as e:
-            error_string = str(e)
-            if "EMAIL_EXISTS" in error_string:
-                flash("This email is already registered. Please log in instead.", "warning")
-            elif "WEAK_PASSWORD" in error_string:
-                flash("Password is too weak. Please use at least 6 characters.", "warning")
-            elif "INVALID_EMAIL" in error_string:
-                flash("Please enter a valid email address.", "danger")
-            else:
-                flash("Signup failed. Please check your connection and try again.", "danger")
+            print(f"🔥 FIREBASE AUTH ERROR: {e}") 
+            flash(f"Signup error: {e}", "danger")
             
     return render_template('signup.html')
 
@@ -141,15 +135,7 @@ def login():
             return redirect(url_for('employer_dashboard'))
             
         except Exception as e:
-            error_string = str(e)
-            print(f"🔥 FIREBASE LOGIN ERROR: {error_string}")
-            
-            if "INVALID_PASSWORD" in error_string or "EMAIL_NOT_FOUND" in error_string or "INVALID_LOGIN_CREDENTIALS" in error_string:
-                flash("Invalid email or password. Please try again.", "danger")
-            elif "TOO_MANY_ATTEMPTS_TRY_LATER" in error_string:
-                flash("Too many failed attempts. Please try again later.", "warning")
-            else:
-                flash("Login failed. Please try again.", "danger")
+            flash("Invalid email or password.", "danger")
             
     return render_template('login.html')
 
