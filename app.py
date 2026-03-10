@@ -36,6 +36,30 @@ except Exception as e:
 # -------------------------------------------------------------
 # SECURITY DECORATOR
 # -------------------------------------------------------------
+
+@app.route('/switch_role')
+@login_required
+def switch_role():
+    # Figure out what they are now, and flip it
+    current_role = session.get('role', 'employer')
+    new_role = 'developer' if current_role == 'employer' else 'employer'
+    
+    # Update the active session
+    session['role'] = new_role
+    
+    # Update the database so it remembers next time they log in
+    if db:
+        try:
+            db.child("users").child(session['user_id']).update({"role": new_role})
+        except Exception as e:
+            print(f"Role update error: {e}")
+            
+    flash(f"Switched to {new_role.capitalize()} mode.", "success")
+    
+    # Send them to their new dashboard
+    if new_role == 'developer':
+        return redirect(url_for('developer_dashboard'))
+    return redirect(url_for('employer_dashboard'))
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
