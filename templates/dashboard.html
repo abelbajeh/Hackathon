@@ -1,12 +1,18 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="max-w-7xl mx-auto py-8">
+<div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
 
     {% if role == 'employer' %}
-    <div class="mb-8 border-b border-gray-700 pb-5">
-        <h1 class="text-3xl font-extrabold text-white">My Workspace</h1>
-        <p class="text-gray-400 mt-2">Manage and deploy your purchased AI agents.</p>
+    <div class="mb-8 border-b border-gray-700 pb-5 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+        <div>
+            <h1 class="text-3xl font-extrabold text-white">My Workspace</h1>
+            <p class="text-gray-400 mt-2">Manage and deploy your purchased AI agents.</p>
+        </div>
+        <a href="{{ url_for('switch_role') }}" class="inline-flex items-center justify-center px-5 py-2.5 border border-gray-600 rounded-full text-sm font-medium text-gray-300 bg-gray-800 hover:bg-gray-700 hover:text-white transition-all shadow-sm whitespace-nowrap">
+            <svg class="w-4 h-4 mr-2 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
+            Switch to Developer Mode
+        </a>
     </div>
 
     {% if bots %}
@@ -40,15 +46,21 @@
 
 
     {% elif role == 'developer' %}
-    <div class="mb-8 border-b border-gray-700 pb-5 flex justify-between items-center">
+    <div class="mb-8 border-b border-gray-700 pb-5 flex flex-col md:flex-row md:justify-between md:items-center gap-5">
         <div>
             <h1 class="text-3xl font-extrabold text-white">Developer Hub</h1>
             <p class="text-gray-400 mt-2">Track your agent performance and revenue.</p>
         </div>
-        <a href="{{ url_for('deploy') }}" class="bg-green-600 hover:bg-green-500 text-white font-bold py-2 px-4 rounded shadow-lg transition flex items-center">
-            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-            Deploy New Agent
-        </a>
+        <div class="flex flex-col sm:flex-row gap-3">
+            <a href="{{ url_for('switch_role') }}" class="inline-flex items-center justify-center px-5 py-2.5 border border-gray-600 rounded-full text-sm font-medium text-gray-300 bg-gray-800 hover:bg-gray-700 hover:text-white transition-all shadow-sm whitespace-nowrap">
+                <svg class="w-4 h-4 mr-2 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
+                Switch to Employer Mode
+            </a>
+            <a href="{{ url_for('deploy') }}" class="bg-green-600 hover:bg-green-500 text-white font-bold py-2.5 px-5 rounded-full shadow-lg transition flex items-center justify-center whitespace-nowrap">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                Deploy New Agent
+            </a>
+        </div>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
